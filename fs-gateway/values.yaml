@@ -27,13 +27,19 @@ nameOverride: ""
 fullnameOverride: ""
 
 service:
-  type: LoadBalancer
-  internalPort: 8080
-  externalPort: 9999
+  enabled: true
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: management
+      port: 9999
+      targetPort: 9999
+      protocol: TCP
 
 ingress:
-  enabled: false
-pvc: 
   enabled: false
 resources:
   # limits:
@@ -50,3 +56,73 @@ tolerations: []
 affinity: {}
 serviceAccount:
   create: true
+autoscaling:
+  enabled: true
+ports:
+  - name: http-8080
+    containerPort: 8080
+    protocol: TCP
+  - name: management
+    containerPort: 9999
+    protocol: TCP
+env:
+  - name: management.server.port
+    value: '9999'
+  - name: spring.profiles.active
+    value: prod
+  - name: server.port
+    value: '8080'
+hostAlias:
+  ip: 10.12.21.22
+  hostnames:
+    - qa-aa-data-provider.fonepay.com
+
+pvc:
+  enabled: true
+  definitions:
+    fonepayswitch-deploy:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+    fonepayswitch-cfg:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+    fonepayswitch-log-ibft:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+volumes:
+  - name: volume-fonepayswitch-deploy
+    persistentVolumeClaim:
+      claimName: fonepayswitch-deploy
+  - name: volume-fonepayswitch-cfg
+    persistentVolumeClaim:
+      claimName: fonepayswitch-cfg
+  - name: volume-fonepayswitch-log-ibft
+    persistentVolumeClaim:
+      claimName: fonepayswitch-log-ibft
+  - name: volume-fonepay-ibft-switch
+    configMap:
+      name: fonepay-ibft-switch-config
+
+volumeMounts:
+  - name: volume-fonepayswitch-deploy
+    mountPath: /app/config/deploy
+  - name: volume-fonepayswitch-cfg
+    mountPath: /app/config/cfg
+  - name: volume-fonepayswitch-log-ibft
+    mountPath: /app/config/log
+  - name: volume-fonepay-ibft-switch
+    mountPath: /app/config/application-prod.properties
+    subPath: application-prod.properties
+
