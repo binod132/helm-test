@@ -49,7 +49,7 @@ env:
     value: '8080'
 pvc:
   enabled: true
-  provisioner: rancher.io/local-path
+  provisioner: "rancher.io/local-path"
   definitions:
     fonepayswitch-deploy:
       accessModes:
