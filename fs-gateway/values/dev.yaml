@@ -1,0 +1,33 @@
+image:
+  repository: harbor.fonepay.com/fonepaylive/fonepay-gateway
+  tag: 6
+  pullPolicy: Always
+  pullSecret: repo-new
+
+replicaCount: 1
+resources:
+  # limits:
+  # # cpu: 200m
+  #  memory: 1200Mi
+  requests:
+   cpu: 100m
+   memory: 400Mi
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 1000
+  targetMemoryUtilizationPercentage: 400
+service:
+  enabled: true
+persistentVolume:
+  storage: 10Gi
+  storageClass: standard
+SERVICE_NAME: fs-gateway
+env:
+  serverPort: "8080"
+  springProfile: prod
+hostAlias:
+  ip: 10.12.21.22
+  hostnames:
+    - qa-aa-data-provider.fonepay.com
