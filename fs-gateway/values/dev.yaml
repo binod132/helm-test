@@ -10,7 +10,7 @@ resources:
   #  memory: 1200Mi
   requests:
    cpu: 100m
-   memory: 500Mi
+   memory: 600Mi
 autoscaling:
   enabled: true
   minReplicas: 1
