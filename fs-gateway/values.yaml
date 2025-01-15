@@ -3,7 +3,6 @@ image:
   repository: harbor.fonepay.com/fonepaylive/fonepay-gateway
   tag: 6
   pullPolicy: Always
-
 hc:
   port: 9999
   liveness:
@@ -11,18 +10,15 @@ hc:
     period: 5
     timeout: 10
     path: "/actuator/health/readiness"
-
   readiness:
     delay: 5
     period: 5
     timeout: 10
     path: "/hc"
-
 PodAutoscaler:
   maxReplicas: 5
   minReplicas: 1
   targetCPU: 60
-
 nameOverride: ""
 fullnameOverride: ""
 

@@ -1,10 +1,9 @@
+replicaCount: 1
 image:
   repository: harbor.fonepay.com/fonepaylive/fonepay-gateway
   tag: 6
   pullPolicy: Always
   pullSecret: repo-new
-
-replicaCount: 1
 resources:
   # limits:
   # # cpu: 200m
@@ -20,10 +19,22 @@ autoscaling:
   targetMemoryUtilizationPercentage: 400
 service:
   enabled: true
-persistentVolume:
-  storage: 10Gi
-  storageClass: standard
+  type: LoadBalancer
+  internalPort: 8080
+  externalPort: 9999
+ingress:
+  enabled: false
+pvc: 
+  enabled: false
+# persistentVolume:
+#   storage: 10Gi
+#   storageClass: standard
 SERVICE_NAME: fs-gateway
+nodeSelector: {}
+tolerations: []
+affinity: {}
+serviceAccount:
+  create: true
 env:
   serverPort: "8080"
   springProfile: prod
