@@ -20,8 +20,8 @@ autoscaling:
 service:
   enabled: true
   type: ClusterIP
-  # internalPort: 8080
-  # externalPort: 9999
+   internalPort: 8080
+   externalPort: 9090
 containerPorts:
   - name: http-8080
     containerPort: 8080
