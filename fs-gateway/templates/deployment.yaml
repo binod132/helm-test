@@ -57,13 +57,26 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
-      {{- with .Values.volumes }}
+            {{- if .Values.configmap.enabled }}
+            {{- range .Values.configmap.definitions }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+            {{- end }}
+            {{- end }}
       volumes:
         {{- if .Values.pvc.enabled }}
         {{- range .Values.pvc.definitions }}
         - name: {{ .name }}
           persistentVolumeClaim:
             claimName: {{ .claimName }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.configmap.enabled }}
+        {{- range .Values.configmap.definitions }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .configMapName }}
         {{- end }}
         {{- end }}
       dnsPolicy: ClusterFirst
