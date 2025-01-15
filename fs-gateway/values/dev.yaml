@@ -35,6 +35,8 @@ tolerations: []
 affinity: {}
 serviceAccount:
   create: true
+nameOverride: ""
+fullnameOverride: ""
 #Change from here
 ingress:
   enabled: false
