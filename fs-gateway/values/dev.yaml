@@ -35,8 +35,8 @@ tolerations: []
 affinity: {}
 serviceAccount:
   create: true
-nameOverride: "test"
-fullnameOverride: "test"
+nameOverride: "fs-gateway"
+fullnameOverride: "fs-gateway"
 #Change from here
 ingress:
   enabled: false
