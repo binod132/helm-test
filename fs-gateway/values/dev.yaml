@@ -77,7 +77,6 @@ pvc:
       resources:
         requests:
           storage: 5Gi
-
 configmap:
   enabled: true
   definitions:
@@ -85,6 +84,14 @@ configmap:
       name: fonepay-ibft-switch-config
       mountPath: /app/config/application-prod.properties
       subPath: application-prod.properties
+      data:
+        application-prod.properties: |
+          spring:
+            cloud:
+              gateway:
+                default-filters:
+                  - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
 hostAlias:
   ip: 10.12.21.22
   hostnames:
