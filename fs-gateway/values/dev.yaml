@@ -19,22 +19,27 @@ autoscaling:
   targetMemoryUtilizationPercentage: 400
 service:
   enabled: true
-  type: LoadBalancer
+  type: ClusterIP
   internalPort: 8080
   externalPort: 9999
-ingress:
-  enabled: false
-pvc: 
-  enabled: false
-# persistentVolume:
-#   storage: 10Gi
-#   storageClass: standard
+# ingress:
+#   enabled: false
+# pvc: 
+#   enabled: false
+# # persistentVolume:
+# #   storage: 10Gi
+# #   storageClass: standard
 SERVICE_NAME: fs-gateway
 nodeSelector: {}
 tolerations: []
 affinity: {}
 serviceAccount:
   create: true
+#Change from here
+ingress:
+  enabled: false
+pvc: 
+  enabled: false
 env:
   serverPort: "8080"
   springProfile: prod
