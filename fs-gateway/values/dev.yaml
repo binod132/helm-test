@@ -48,7 +48,7 @@ env:
   - name: server.port
     value: '8080'
 pvc:
-  enabled: true
+  enabled: false
   definitions:
     fonepayswitch-deploy:
       volumeName: volume-fonepayswitch-deploy
@@ -80,12 +80,12 @@ pvc:
 configmap:
   enabled: true
   definitions:
-    fonepay-ibft-switch-config:
-      name: fonepay-ibft-switch-config
-      mountPath: /app/config/application-prod.properties
-      subPath: application-prod.properties
+    gateway-config:
+      name: gateway-config
+      mountPath: /app/config/application-prod.yml
+      subPath: application-prod.yml
       data:
-        application-prod.properties: |
+        application-prod.yml: |
           spring:
             cloud:
               gateway:
