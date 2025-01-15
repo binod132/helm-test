@@ -27,7 +27,11 @@ If release name contains chart name it will be used as a full name.
 Create chart name and version as used by the chart label.
 */}}
 {{- define "fs-gateway.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- if .Chart }}
+{{- printf "%s-%s" (default "fs-gateway" .Chart.Name) (default "0.1.0" .Chart.Version) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- else }}
+"fs-gateway-0.1.0" # Fallback if .Chart is nil
+{{- end }}
 {{- end }}
 
 {{/*
