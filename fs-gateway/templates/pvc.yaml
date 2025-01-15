@@ -11,6 +11,7 @@ spec:
   resources:
     requests:
       storage: {{ $pvc.resources.requests.storage }}
+  provisioner: {{ .Values.pvc.provisioner | default "rancher.io/local-path" }}
 ---
 {{- end }}
 {{- end }}
