@@ -51,19 +51,29 @@ pvc:
   enabled: true
   provisioner: "rancher.io/local-path"
   definitions:
-    - name: volume-fonepayswitch-deploy
-      claimName: fonepayswitch-deploy
-      mountPath: /app/config/deploy
-    - name: volume-fonepayswitch-cfg
-      claimName: fonepayswitch-cfg
-      mountPath: /app/config/cfg
-    - name: volume-fonepayswitch-log-ibft
-      claimName: fonepayswitch-log-ibft
-      mountPath: /app/config/log
-    - name: volume-fonepay-ibft-switch
-      configMapName: fonepay-ibft-switch-config
-      mountPath: /app/config/application-prod.properties
-      subPath: application-prod.properties
+    fonepayswitch-deploy:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+    fonepayswitch-cfg:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+    fonepayswitch-log-ibft:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+
+
 hostAlias:
   ip: 10.12.21.22
   hostnames:

@@ -1,0 +1,17 @@
+{{- if and .Values.pvc.enabled .Values.pvc.definitions }}
+{{- range $name, $pvc := .Values.pvc.definitions }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}
+spec:
+  accessModes:
+    {{- toYaml $pvc.accessModes | nindent 6 }}
+  storageClassName: {{ $pvc.storageClassName }}
+  resources:
+    requests:
+      storage: {{ $pvc.resources.requests.storage }}
+  provisioner:  "rancher.io/local-path"
+---
+{{- end }}
+{{- end }}
