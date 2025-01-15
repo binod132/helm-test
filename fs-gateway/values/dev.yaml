@@ -47,28 +47,42 @@ env:
     value: prod
   - name: server.port
     value: '8080'
-configmap:
-  enabled: false
-  definitions:
-    - name: fonepay-ibft-switch
-      configMapName: fonepay-ibft-switch-config
-      mountPath: /app/config/application-prod.properties
-      subPath: application-prod.properties
 pvc:
   enabled: true
-  provisioner: "rancher.io/local-path"
   definitions:
-    - name: volume-fonepayswitch-deploy
-      claimName: fonepayswitch-deploy
+    fonepayswitch-deploy:
+      volumeName: volume-fonepayswitch-deploy
       mountPath: /app/config/deploy
-    - name: volume-fonepayswitch-cfg
-      claimName: fonepayswitch-cfg
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+    fonepayswitch-cfg:
+      volumeName: volume-fonepayswitch-cfg
       mountPath: /app/config/cfg
-    - name: volume-fonepayswitch-log-ibft
-      claimName: fonepayswitch-log-ibft
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+    fonepayswitch-log-ibft:
+      volumeName: volume-fonepayswitch-log-ibft
       mountPath: /app/config/log
-    - name: volume-fonepay-ibft-switch
-      configMapName: fonepay-ibft-switch-config
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+
+configmap:
+  enabled: true
+  definitions:
+    fonepay-ibft-switch-config:
+      name: fonepay-ibft-switch-config
       mountPath: /app/config/application-prod.properties
       subPath: application-prod.properties
 hostAlias:

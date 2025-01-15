@@ -49,34 +49,31 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             {{- if .Values.pvc.enabled }}
-            {{- range .Values.pvc.definitions }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
-              {{- if .subPath }}
-              subPath: {{ .subPath }}
-              {{- end }}
+            {{- range $name, $pvc := .Values.pvc.definitions }}
+            - name: {{ $pvc.volumeName }}
+              mountPath: {{ $pvc.mountPath }}
             {{- end }}
             {{- end }}
             {{- if .Values.configmap.enabled }}
-            {{- range .Values.configmap.definitions }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
+            {{- range $name, $configmap := .Values.configmap.definitions }}
+            - name: {{ $configmap.name }}
+              mountPath: {{ $configmap.mountPath }}
+              subPath: {{ $configmap.subPath }}
             {{- end }}
             {{- end }}
       volumes:
         {{- if .Values.pvc.enabled }}
-        {{- range .Values.pvc.definitions }}
-        - name: {{ .name }}
+        {{- range $name, $pvc := .Values.pvc.definitions }}
+        - name: {{ $pvc.volumeName }}
           persistentVolumeClaim:
-            claimName: {{ .claimName }}
+            claimName: {{ $name }}
         {{- end }}
         {{- end }}
         {{- if .Values.configmap.enabled }}
-        {{- range .Values.configmap.definitions }}
-        - name: {{ .name }}
+        {{- range $name, $configmap := .Values.configmap.definitions }}
+        - name: {{ $configmap.name }}
           configMap:
-            name: {{ .configMapName }}
+            name: {{ $configmap.name }}
         {{- end }}
         {{- end }}
       dnsPolicy: ClusterFirst
