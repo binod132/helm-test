@@ -35,8 +35,8 @@ tolerations: []
 affinity: {}
 serviceAccount:
   create: true
-nameOverride: "test"
-fullnameOverride: "test"
+nameOverride: "test-2"
+fullnameOverride: "test-2"
 #Change from here
 ingress:
   enabled: false
@@ -50,30 +50,47 @@ env:
 pvc:
   enabled: true
   definitions:
-    fonepayswitch-deploy:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: local-path
-      resources:
-        requests:
-          storage: 5Gi
+    fonepayswitch-deploy-2:
+      volumeName: volume-fonepayswitch-deploy-2
       mountPath: /app/config/deploy
-    fonepayswitch-cfg:
       accessModes:
         - ReadWriteOnce
       storageClassName: local-path
       resources:
         requests:
           storage: 5Gi
+    fonepayswitch-cfg-2:
+      volumeName: volume-fonepayswitch-cfg-2
       mountPath: /app/config/cfg
-    fonepayswitch-log-ibft:
       accessModes:
         - ReadWriteOnce
       storageClassName: local-path
       resources:
         requests:
           storage: 5Gi
+    fonepayswitch-log-ibft-2:
+      volumeName: volume-fonepayswitch-log-ibft-2
       mountPath: /app/config/log
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+configmap:
+  enabled: true
+  definitions:
+    fonepay-ibft-switch-config-2:
+      name: fonepay-ibft-switch-config-2
+      mountPath: /app/config/application-prod.properties
+      subPath: application-prod.properties
+      data:
+        application-prod.properties: |
+          spring:
+            cloud:
+              gateway:
+                default-filters:
+                  - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
 hostAlias:
   ip: 10.12.21.22

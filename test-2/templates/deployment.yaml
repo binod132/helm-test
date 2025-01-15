@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "fs-gateway.fullname" . }}
+  name: {{ include "test-2.fullname" . }}
   labels:
-    {{- include "fs-gateway.labels" . | nindent 4 }}
+    {{- include "test-2.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "fs-gateway.selectorLabels" . | nindent 6 }}
+      {{- include "test-2.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
         timestamp: "{{ now | date "20060102150405" }}"
       labels:
-        {{- include "fs-gateway.labels" . | nindent 8 }}
+        {{- include "test-2.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -26,7 +26,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "fs-gateway.serviceAccountName" . }}
+      serviceAccountName: {{ include "test-2.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -49,35 +49,31 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             {{- if .Values.pvc.enabled }}
-            {{- range .Values.pvc.definitions }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
-              {{- if .subPath }}
-              subPath: {{ .subPath }}
-              {{- end }}
+            {{- range $name, $pvc := .Values.pvc.definitions }}
+            - name: {{ $pvc.volumeName }}
+              mountPath: {{ $pvc.mountPath }}
             {{- end }}
             {{- end }}
             {{- if .Values.configmap.enabled }}
-            {{- range .Values.configmap.definitions }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
+            {{- range $name, $configmap := .Values.configmap.definitions }}
+            - name: {{ $configmap.name }}
+              mountPath: {{ $configmap.mountPath }}
+              subPath: {{ $configmap.subPath }}
             {{- end }}
             {{- end }}
-      {{- with .Values.volumes }}
       volumes:
         {{- if .Values.pvc.enabled }}
-        {{- range .Values.pvc.definitions }}
-        - name: {{ .name }}
+        {{- range $name, $pvc := .Values.pvc.definitions }}
+        - name: {{ $pvc.volumeName }}
           persistentVolumeClaim:
-            claimName: {{ .name }}
+            claimName: {{ $name }}
         {{- end }}
         {{- end }}
         {{- if .Values.configmap.enabled }}
-        {{- range .Values.configmap.definitions }}
-        - name: {{ .name }}
+        {{- range $name, $configmap := .Values.configmap.definitions }}
+        - name: {{ $configmap.name }}
           configMap:
-            name: {{ .configMapName }}
+            name: {{ $configmap.name }}
         {{- end }}
         {{- end }}
       dnsPolicy: ClusterFirst
