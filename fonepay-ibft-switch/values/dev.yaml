@@ -20,8 +20,15 @@ autoscaling:
 service:
   enabled: true
   type: ClusterIP
-  internalPort: 8080
-  externalPort: 9999
+  # internalPort: 8080
+  # externalPort: 9999
+containerPorts:
+  - name: http-8080
+    containerPort: 8080
+    protocol: TCP
+  - name: management
+    containerPort: 9999
+    protocol: TCP
 # ingress:
 #   enabled: false
 # pvc: 
@@ -29,14 +36,14 @@ service:
 # # persistentVolume:
 # #   storage: 10Gi
 # #   storageClass: standard
-SERVICE_NAME: fs-gateway
+SERVICE_NAME: fonepay-ibft-switch
 nodeSelector: {}
 tolerations: []
 affinity: {}
 serviceAccount:
   create: true
-nameOverride: "test-2"
-fullnameOverride: "test-2"
+nameOverride: "fonepay-ibft-switch"
+fullnameOverride: "fonepay-ibft-switch"
 #Change from here
 ingress:
   enabled: false
@@ -50,8 +57,8 @@ env:
 pvc:
   enabled: true
   definitions:
-    fonepayswitch-deploy-2:
-      volumeName: volume-fonepayswitch-deploy-2
+    fonepayswitch-deploy:
+      volumeName: volume-fonepayswitch-deploy
       mountPath: /app/config/deploy
       accessModes:
         - ReadWriteOnce
@@ -59,8 +66,8 @@ pvc:
       resources:
         requests:
           storage: 5Gi
-    fonepayswitch-cfg-2:
-      volumeName: volume-fonepayswitch-cfg-2
+    fonepayswitch-cfg:
+      volumeName: volume-fonepayswitch-cfg
       mountPath: /app/config/cfg
       accessModes:
         - ReadWriteOnce
@@ -68,8 +75,8 @@ pvc:
       resources:
         requests:
           storage: 5Gi
-    fonepayswitch-log-ibft-2:
-      volumeName: volume-fonepayswitch-log-ibft-2
+    fonepayswitch-log-ibft:
+      volumeName: volume-fonepayswitch-log-ibft
       mountPath: /app/config/log
       accessModes:
         - ReadWriteOnce
@@ -80,18 +87,87 @@ pvc:
 configmap:
   enabled: true
   definitions:
-    fonepay-ibft-switch-config-2:
-      name: fonepay-ibft-switch-config-2
+    fonepay-ibft-switch-config:
+      name: fonepay-ibft-switch-config
       mountPath: /app/config/application-prod.properties
       subPath: application-prod.properties
       data:
         application-prod.properties: |
-          spring:
-            cloud:
-              gateway:
-                default-filters:
-                  - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-                  - Test=abc
+          spring.datasource.url=jdbc:mysql://10.71.215.20:3306/FONEPAY_SWITCH?serverTimezone=Asia/Kathmandu
+          spring.datasource.username=fp__switch
+          spring.datasource.password=b8726a9d1ca9b31974bbdff484add74f
+
+          spring.datasource.hikari.maximum-pool-size=25
+          spring.datasource.hikari.connection-timeout=30000
+          logging.level.com.zaxxer.hikari=info
+
+          fonepay.project.version=UAT 0.0.1
+
+          iso.log.location =/app/config/log/
+
+          #Timeout period
+          resttemplate.connect.timeout.milli=5000
+          resttemplate.read.timeout.milli=5000
+
+          convergent.settlement.basicAuthUsername=fonepayConvergent
+          convergent.settlement.basicAuthPasswordHash=$2a$04$N3OSb2Co4fW8fmNr6wpVY.PwY2vvgZjpC4mEjzpf8GQqa9BMw0ake
+
+          logging.level.root=info
+          logging.pattern.console=%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(18971){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}[%5L]){cyan} %clr(:){faint} %m%n%wEx
+          logging.file.path=/app/config/log/
+
+          fonepay.redis.host=10.71.215.10
+          fonepay.redis.port=6379
+          fonepay.redis.password=cdc872db616ac66adb3166c75e9ad183
+
+          fonepay.redis.ttl.hours=24
+          fonepay.redis.timeout.secs=3
+          fonepay.redis.socket.timeout.secs=3
+
+          encrypt.algo = AES
+          encrypt.keyValue=stbjcSBuW2OBorSs
+          jwt.aes.encrypt.keyValue=ab854uW10B6gras
+
+
+          fonepay.microservice.service.communication.username=NewUserForInternalServiceCommunication
+          fonepay.microservice.service.communication.password=B*KcORBPOyF*OO6wQHe+7uZOu
+
+          fonepay.microservice.service.communication.clientId=INTERNAL_MICROSERVICE_USER
+          fonepay.microservice.service.communication.clientSecret=secretkey1
+          fonepay.microservice.service.communication.grantType=password
+
+          fonepay.microservice.configService.internalBaseUrl=http://config
+          fonepay.microservice.internalSwitch.internalBaseUrl=http://internal-ibft-switch.fonepay-switch:8080/fonepayInternalSwitch
+          fonepay.microservice.service.communication.accessTokenUri=http://oauth2:8080/fonepayAuth/oauth/token
+          fonepay.javamelody.collectServerUrl=http://javamelody-collector-server.utility-servers:8080/
+
+          elasticsearch.host = localhost
+          elasticsearch.port = 9200
+          elasticsearch.username=admin
+          elasticsearch.password=admin
+
+          fonepay.config.oauth2.publicKey=-----BEGIN PUBLIC KEY----- MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArZSCYlpYHSN7a9OrqLgb FEihyI3c2SlBXwE3D3FRXBb9Z5IZA72iDOK5FV+5ilr2LzJC1HuPmoAPP0KYSI1U uwD7jKVUuA3fXUX/3m7TczV8ekxhWYqpJLAFQWzBoWsxOfbno+kpg6HiAcSIiw+3 hfnNpYDmDRz83DiNHs+HIAAhiy5QmksTdIiI51Q8IiGANyUiTFPjxaMLTMeRzhae dvQYxiW+tmqeW5l7W1k2lCBt3X/M6U+B510sSN+VPnJYSjOjfhLQ4KWn+Nw+M52c v4rb2YoopvFxf11V9C5V2UUmXCEY2N+EH1QtzDfSr+DOMiBRfEtiAWtHCKJSjldf PwIDAQAB -----END PUBLIC KEY-----
+
+
+          acquirerdb.encrypt.algo = AES
+          acquirerdb.encrypt.keyValue = stbjcSBuW2OBorSu
+          qrswitchdb.encrypt.algo = AES
+          qrswitchdb.encrypt.keyValue = stbjcSBuW2OBorSu
+          transconnect.encrypt.algo = AES
+          transconnect.encrypt.keyValue = stbjcSBuW2OBorSu
+
+          ## KAFKA SETTINGS
+          fonepay.kafka.bootstrapAddress=10.19.222.61:30247
+          fonepay.kafka.topic.ibft.report=ibft-report-prod
+          fonepay.kafka.topic.ibft.reportResponse=ibft-report-response-prod
+          spring.kafka.bootstrap-servers=10.19.222.61:30247
+          spring.kafka.producer.bootstrap-servers=10.19.222.61:30247
+          spring.kafka.consumer.bootstrap-servers=10.19.222.61:30247
+          fonepay.signature.enabled = true
+
+          mobile.banking.api.key=verifier
+          mobile.banking.api.secret=8e6c551cb2d28f502ee654e9add69b4c
+
 
 hostAlias:
   ip: 10.12.21.22
