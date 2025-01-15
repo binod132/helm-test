@@ -54,6 +54,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+nameOverride: "fs-gateway"
+fullnameOverride: "fs-gateway"
+
 serviceAccount:
   create: true
 autoscaling:
