@@ -21,7 +21,14 @@ service:
   enabled: true
   type: ClusterIP
   internalPort: 8080
-  externalPort: 9999
+  externalPort: 9090
+containerPorts:
+  - name: http-8080
+    containerPort: 8080
+    protocol: TCP
+  - name: management
+    containerPort: 9999
+    protocol: TCP
 # ingress:
 #   enabled: false
 # pvc: 

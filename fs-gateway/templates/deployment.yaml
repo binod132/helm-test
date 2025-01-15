@@ -38,9 +38,11 @@ spec:
           env:
             {{- toYaml .Values.env | nindent 12 }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.externalPort }}
-              protocol: TCP
+            {{- range .Values.containerPorts }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+            {{- end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
