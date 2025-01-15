@@ -47,16 +47,38 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- if .Values.pvc.enabled }}
+            {{- range .Values.pvc.definitions }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.configmap.enabled }}
+            {{- range .Values.configmap.definitions }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+            {{- end }}
+            {{- end }}
       {{- with .Values.volumes }}
       volumes:
-        {{- range $name, $pvc := .Values.pvc.definitions }}
-        - name: {{ $name }}
+        {{- if .Values.pvc.enabled }}
+        {{- range .Values.pvc.definitions }}
+        - name: {{ .name }}
           persistentVolumeClaim:
-            claimName: {{ $name }}
+            claimName: {{ .name }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.configmap.enabled }}
+        {{- range .Values.configmap.definitions }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .configMapName }}
+        {{- end }}
         {{- end }}
       dnsPolicy: ClusterFirst
       hostAliases:

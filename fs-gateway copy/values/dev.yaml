@@ -49,7 +49,6 @@ env:
     value: '8080'
 pvc:
   enabled: true
-  provisioner: "rancher.io/local-path"
   definitions:
     fonepayswitch-deploy:
       accessModes:
@@ -58,6 +57,7 @@ pvc:
       resources:
         requests:
           storage: 5Gi
+      mountPath: /app/config/deploy
     fonepayswitch-cfg:
       accessModes:
         - ReadWriteOnce
@@ -65,6 +65,7 @@ pvc:
       resources:
         requests:
           storage: 5Gi
+      mountPath: /app/config/cfg
     fonepayswitch-log-ibft:
       accessModes:
         - ReadWriteOnce
@@ -72,7 +73,7 @@ pvc:
       resources:
         requests:
           storage: 5Gi
-
+      mountPath: /app/config/log
 
 hostAlias:
   ip: 10.12.21.22
