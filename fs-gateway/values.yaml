@@ -1,0 +1,2 @@
+pvc:
+  provisioner: rancher.io/local-path
