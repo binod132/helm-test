@@ -47,6 +47,13 @@ env:
     value: prod
   - name: server.port
     value: '8080'
+configmap:
+  enabled: false
+  definitions:
+    - name: fonepay-ibft-switch
+      configMapName: fonepay-ibft-switch-config
+      mountPath: /app/config/application-prod.properties
+      subPath: application-prod.properties
 pvc:
   enabled: true
   provisioner: "rancher.io/local-path"
