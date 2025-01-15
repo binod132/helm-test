@@ -38,8 +38,6 @@ serviceAccount:
 #Change from here
 ingress:
   enabled: false
-pvc: 
-  enabled: false
 env:
   - name: management.server.port
     value: '9999'
@@ -47,6 +45,23 @@ env:
     value: prod
   - name: server.port
     value: '8080'
+pvc:
+  enabled: true
+  definitions:
+    fonepayswitch-deploy:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+    fonepayswitch-cfg:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
 hostAlias:
   ip: 10.12.21.22
   hostnames:

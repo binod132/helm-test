@@ -1,4 +1,5 @@
-{{- if .Values.pvc.enabled }}
+{{- if and .Values.pvc.enabled .Values.pvc.definitions }}
+{{- range $name, $pvc := .Values.pvc.definitions }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,4 +13,5 @@ spec:
     requests:
       storage: {{ .Values.persistentVolume.storage }}
   storageClassName: {{ .Values.persistentVolume.storageClass }}
+{{- end }}
 {{- end }}
