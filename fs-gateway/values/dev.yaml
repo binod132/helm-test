@@ -57,8 +57,8 @@ env:
 pvc:
   enabled: false
   definitions:
-    fonepayswitch-deploy:
-      volumeName: volume-fonepayswitch-deploy
+    fs-deploy:
+      volumeName: volume-fs-deploy
       mountPath: /app/config/deploy
       accessModes:
         - ReadWriteOnce
@@ -66,8 +66,8 @@ pvc:
       resources:
         requests:
           storage: 5Gi
-    fonepayswitch-cfg:
-      volumeName: volume-fonepayswitch-cfg
+    fs-cfg:
+      volumeName: volume-fs-cfg
       mountPath: /app/config/cfg
       accessModes:
         - ReadWriteOnce
@@ -75,8 +75,8 @@ pvc:
       resources:
         requests:
           storage: 5Gi
-    fonepayswitch-log-ibft:
-      volumeName: volume-fonepayswitch-log-ibft
+    fs-log-ibft:
+      volumeName: volume-fs-log-ibft
       mountPath: /app/config/log
       accessModes:
         - ReadWriteOnce
@@ -102,4 +102,4 @@ configmap:
 hostAlias:
   ip: 10.12.21.22
   hostnames:
-    - qa-aa-data-provider.fonepay.com
+    - abc.com
