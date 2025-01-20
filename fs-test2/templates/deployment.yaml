@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fs-test2.fullname" . }}
+  labels:
+    {{- include "fs-test2.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "fs-test2.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+        timestamp: "{{ now | date "20060102150405" }}"
+      labels:
+        {{- include "fs-test2.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fs-test2.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          ports:
+            {{- range .Values.containerPorts }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            {{- if .Values.pvc.enabled }}
+            {{- range $name, $pvc := .Values.pvc.definitions }}
+            - name: {{ $pvc.volumeName }}
+              mountPath: {{ $pvc.mountPath }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.configmap.enabled }}
+            {{- range $name, $configmap := .Values.configmap.definitions }}
+            - name: {{ $configmap.name }}
+              mountPath: {{ $configmap.mountPath }}
+              subPath: {{ $configmap.subPath }}
+            {{- end }}
+            {{- end }}
+      volumes:
+        {{- if .Values.pvc.enabled }}
+        {{- range $name, $pvc := .Values.pvc.definitions }}
+        - name: {{ $pvc.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ $name }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.configmap.enabled }}
+        {{- range $name, $configmap := .Values.configmap.definitions }}
+        - name: {{ $configmap.name }}
+          configMap:
+            name: {{ $configmap.name }}
+        {{- end }}
+        {{- end }}
+      dnsPolicy: ClusterFirst
+      hostAliases:
+      - ip: {{ .Values.hostAlias.ip }}
+        hostnames:
+        {{- range .Values.hostAlias.hostnames }}
+        - {{ . }}
+        {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecret }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
